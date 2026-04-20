@@ -16,6 +16,8 @@ import { contractAddress, abi } from "../lib/contract";
 import { FileType } from "@/types/File";
 
 export default function Home() {
+  const PINATA_GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY as string;
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -72,94 +74,96 @@ export default function Home() {
     }
   };
 
-  if (!mounted) return <div className="p-4 text-gray-400">Loading...</div>;
+  if (!mounted) return <div className="p-4 text-gray-500">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 font-mono">
-      <div className="max-w-xl mx-auto space-y-6">
-        <h1 className="text-2xl text-center font-bold tracking-wide text-green-400">
-          Decentralized Storage
-        </h1>
+    <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center px-4">
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-5">
+          <h1 className="text-xl font-semibold text-green-400">
+            Decentralized Storage
+          </h1>
 
-        {/* wallet connection */}
-        <div className="border border-green-500/30 p-4 rounded-lg bg-black/40 backdrop-blur">
-          {!isConnected ? (
-            <button
-              onClick={() => connect({ connector: injected() })}
-              className="border border-green-400 px-4 py-1 rounded hover:bg-green-400 hover:text-black transition"
-            >
-              Connect Wallet
-            </button>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-400 break-all">{address}</p>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 space-y-4 shadow-sm">
+            {/* wallet connection */}
+            {!isConnected ? (
               <button
-                onClick={() => disconnect()}
-                className="border border-red-400 px-3 py-1 rounded hover:bg-red-400 hover:text-black transition"
+                onClick={() => connect({ connector: injected() })}
+                className="w-full py-2 rounded-lg bg-green-500 text-black text-sm font-medium hover:bg-green-400 transition"
               >
-                Disconnect
+                Connect Wallet
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-gray-400 break-all">{address}</p>
+                <button
+                  onClick={() => disconnect()}
+                  className="w-full py-2 rounded-lg border border-red-500 text-red-400 text-sm hover:bg-red-500 hover:text-black transition"
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+
+            {/* upload on ipfs */}
+            <div className="space-y-2">
+              <input
+                type="file"
+                className="w-full text-xs text-gray-300 file:mr-3 file:px-3 file:py-1 file:border file:border-neutral-700 file:rounded file:bg-neutral-800 file:text-white"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
+              <button
+                onClick={handleUpload}
+                disabled={loading}
+                className="w-full py-2 rounded-lg bg-green-500 text-black text-sm font-medium hover:bg-green-400 disabled:opacity-50 transition"
+              >
+                {loading ? "Uploading..." : "Upload"}
               </button>
             </div>
-          )}
-        </div>
 
-        {/* upload on ipfs */}
-        <div className="border border-green-500/30 p-4 rounded-lg space-y-3 bg-black/40">
-          <input
-            type="file"
-            className="text-sm text-gray-300"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-          />
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="border border-green-400 px-4 py-1 rounded hover:bg-green-400 hover:text-black transition disabled:opacity-50"
-          >
-            {loading ? "Uploading..." : "Upload"}
-          </button>
-        </div>
+            {/* cid of file */}
+            {cid && (
+              <div className="text-xs bg-neutral-800 p-3 rounded-lg space-y-1">
+                <p className="text-green-400">CID</p>
+                <p className="break-all text-gray-300">{cid}</p>
+                <a
+                  href={`https://${PINATA_GATEWAY}/ipfs/${cid}`}
+                  target="_blank"
+                  className="text-green-400 underline"
+                >
+                  Open File
+                </a>
+              </div>
+            )}
 
-        {/* cid of file */}
-        {cid && (
-          <div className="border border-green-500/30 p-4 rounded-lg bg-black/40">
-            <p className="text-green-400 text-sm mb-1">CID</p>
-            <p className="text-xs break-all text-gray-300">{cid}</p>
-            <a
-              href={`https://pinata.cloud/ipfs/${cid}`}
-              target="_blank"
-              className="text-green-400 text-xs underline"
-            >
-              Open File
-            </a>
+            {/* view transaction on Etherscan */}
+            {txHash && (
+              <div className="text-xs bg-neutral-800 p-3 rounded-lg space-y-1">
+                <p className="text-green-400">Transaction</p>
+                <p className="break-all text-gray-300">{txHash}</p>
+                <a
+                  href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                  target="_blank"
+                  className="text-green-400 underline"
+                >
+                  View on Etherscan
+                </a>
+              </div>
+            )}
           </div>
-        )}
-
-        {/* view transaction on Etherscan */}
-        {txHash && (
-          <div className="border border-green-500/30 p-4 rounded-lg bg-black/40">
-            <p className="text-green-400 text-sm mb-1">Transaction</p>
-            <p className="text-xs break-all text-gray-300">{txHash}</p>
-            <a
-              href={`https://etherscan.io/tx/${txHash}`}
-              target="_blank"
-              className="text-green-400 text-xs underline"
-            >
-              View on Etherscan
-            </a>
-          </div>
-        )}
+        </div>
 
         {/* Show all files */}
         <div>
-          <h2 className="text-green-400 mb-2">Your Files</h2>
-          <div className="space-y-2">
+          <h1 className="text-xl font-semibold text-green-400">Your Files</h1>
+          <div className="space-y-2 max-h-125 overflow-y-auto pr-2">
             {Array.isArray(files) && files.length > 0 ? (
               files.map((f, i) => (
                 <a
                   key={i}
-                  href={`https://pinata.cloud/ipfs/${f.cid}`}
+                  href={`https://${PINATA_GATEWAY}/ipfs/${f.cid}`}
                   target="_blank"
-                  className="block border border-green-500/20 p-2 rounded text-sm hover:bg-green-400/10 transition"
+                  className="block text-sm bg-neutral-900 border border-neutral-800 px-3 py-2 rounded-lg hover:bg-neutral-800 transition"
                 >
                   {f.name}
                 </a>
