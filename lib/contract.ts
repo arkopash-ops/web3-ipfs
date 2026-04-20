@@ -1,7 +1,25 @@
 export const contractAddress =
-    "0x1D747B2f38000FFdf1D6090E354A3a4188C1aC1D";
+    "0x54A6564E2f0DbCa3306bF30522E9eCCdB2DB1f02";
 
 export const abi = [
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "cid",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            }
+        ],
+        "name": "storeFile",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
     {
         "inputs": [
             {
@@ -31,24 +49,6 @@ export const abi = [
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "cid",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            }
-        ],
-        "name": "storeFile",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     }
 ] as const;

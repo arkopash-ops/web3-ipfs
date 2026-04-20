@@ -1,4 +1,10 @@
-export interface FileType {
+export interface FileMetadata {
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+    description?: string;
+    tags?: string[];
     cid: string;
-    name: string;
+    uploadedAt: number;
+    walletAddress?: string;
 }
